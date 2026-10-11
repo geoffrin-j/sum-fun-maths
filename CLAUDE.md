@@ -115,6 +115,6 @@ Set per question by difficulty: quick recall ~15 s, single-step ~20–25 s, mult
 
 - Build DOM with `SF.el(tag, attrs, ...children)`; never set `innerHTML` from content.
 - UI copy: plain, short, sentence case, written for an 8-year-old. Errors say what to do next.
-- Design tokens are CSS variables at the top of `css/style.css` (graph-paper exercise book, ink outlines, chunky offset shadows). Keep new UI in that style.
+- Design tokens are CSS variables at the top of `css/style.css` (soft pastel app look: white rounded cards, gentle shadows, teal pill buttons, pastel tiles, Nunito). Keep new UI in that style.
 - After any content or checker change, run `node tests/run-tests.js` and make sure it passes.
 - After UI changes, open `index.html` in Chrome and click through: home → class → chapter → lesson → test → results.
