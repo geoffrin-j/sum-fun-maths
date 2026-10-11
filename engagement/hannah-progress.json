@@ -1,0 +1,20 @@
+{
+  "app": "Sum Fun Maths",
+  "version": 1,
+  "learner": "Hannah Jasar",
+  "createdAt": "2026-10-11T11:52:29.461Z",
+  "updatedAt": "2026-10-11T11:53:26.663Z",
+  "streak": {
+    "current": 0,
+    "best": 0,
+    "lastDay": null
+  },
+  "practiceDays": [],
+  "subtopics": {},
+  "badges": {},
+  "manualUnlocks": {},
+  "lastLesson": null,
+  "settings": {
+    "sound": true
+  }
+}
