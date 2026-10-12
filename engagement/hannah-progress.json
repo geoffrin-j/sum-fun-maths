@@ -3,7 +3,7 @@
   "version": 1,
   "learner": "Hannah Jasar",
   "createdAt": "2026-10-11T11:52:29.461Z",
-  "updatedAt": "2026-10-11T11:53:26.663Z",
+  "updatedAt": "2026-10-11T13:42:26.153Z",
   "streak": {
     "current": 0,
     "best": 0,
@@ -15,6 +15,7 @@
   "manualUnlocks": {},
   "lastLesson": null,
   "settings": {
-    "sound": true
+    "sound": true,
+    "theme": "berry"
   }
 }

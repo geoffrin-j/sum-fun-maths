@@ -48,9 +48,29 @@
     };
   }
 
+  // ---------- themes ----------
+
+  // Colours live in css/style.css under [data-theme="id"].
+  S.themes = [
+    { id: "ocean", name: "Ocean", icon: "🐬" },
+    { id: "berry", name: "Berry", icon: "🍓" },
+    { id: "sunshine", name: "Sunshine", icon: "🌻" },
+    { id: "forest", name: "Forest", icon: "🌳" },
+    { id: "galaxy", name: "Galaxy", icon: "🚀" },
+    { id: "sky", name: "Sky", icon: "🪁" }
+  ];
+
+  function themeId() {
+    const id = SF.store.progress.settings.theme;
+    return S.themes.some(function (t) { return t.id === id; }) ? id : "ocean";
+  }
+
+  S.applyTheme = function () { document.documentElement.setAttribute("data-theme", themeId()); };
+
   // ---------- header and file banner ----------
 
   S.header = function () {
+    S.applyTheme();
     const p = SF.store.progress, soundOn = p.settings.sound !== false;
     const streak = L().currentStreak();
     document.getElementById("topbar").replaceChildren(
@@ -66,6 +86,7 @@
           class: "chip icon", type: "button", "aria-label": soundOn ? "Turn sound off" : "Turn sound on",
           onclick: function () { p.settings.sound = !soundOn; SF.store.save(); }
         }, soundOn ? "🔊" : "🔇"),
+        el("a", { class: "chip icon", href: "#/style", "aria-label": "Change colours", title: "Change colours" }, "🎨"),
         el("a", { class: "chip icon", href: "#/parent", "aria-label": "Parent corner", title: "Parent corner" }, "⚙️")));
   };
 
@@ -101,7 +122,7 @@
   S.home = function (root) {
     const p = SF.store.progress, name = SF.config.firstName || "there";
     const streak = L().currentStreak();
-    const grades = D().grades();
+    const grades = D().classes(), olympiads = D().olympiads();
 
     let g = p.lastLesson ? D().grade(p.lastLesson.split("/")[0]) : null;
     if (!g || !D().countLessons(g)) g = grades.filter(function (x) { return D().countLessons(x) > 0; })[0] || null;
@@ -148,7 +169,18 @@
           return el("a", { class: "grade-tile", href: D().href.grade(gr) }, parts,
             el("span", { class: "grade-meta" }, st.passed + " of " + total + " lessons passed"),
             bar(st.passed / total));
-        }))));
+        }))),
+      olympiads.length ? el("section", { class: "olympiad-section" },
+        el("h2", null, "Olympiad practice"),
+        el("p", { class: "muted" }, "Extra maths and reasoning for olympiad exams. Every topic is open."),
+        el("div", { class: "grade-grid" }, olympiads.map(function (gr) {
+          const total = D().countLessons(gr), st = L().gradeStats(gr);
+          return el("a", { class: "grade-tile olympiad", href: D().href.grade(gr) },
+            el("span", { class: "grade-num", "aria-hidden": "true" }, "🏆"),
+            el("span", { class: "grade-title" }, gr.title),
+            el("span", { class: "grade-meta" }, st.passed + " of " + total + " topics passed"),
+            bar(total ? st.passed / total : 0));
+        }))) : null);
   };
 
   // ---------- class (list of chapters) ----------
@@ -175,7 +207,9 @@
     root.replaceChildren(el("section", { class: "page" },
       crumbs([["Home", "#/"]], g.title),
       el("h1", null, g.title),
-      el("p", { class: "lede" }, "Finish each chapter to open the next one."),
+      g.openAll ? null : el("p", { class: "lede" }, "Finish each chapter to open the next one."),
+      g.intro && g.intro.length ? el("section", { class: "card intro-card" },
+        g.intro.map(function (line) { return el("p", null, line); })) : null,
       list));
   };
 
@@ -187,9 +221,11 @@
       const key = D().key(g.id, t.id, s.id), rec = L().rec(key);
       const passed = L().isPassed(key), open = L().isSubUnlocked(g, ti, si);
       const n = D().testLength(s);
-      const state = passed ? "passed" : open ? "current" : "locked";
+      // Olympiad sets (openAll) have no single "next" lesson, so open ones look plain.
+      const state = passed ? "passed" : open ? (g.openAll ? "open" : "current") : "locked";
+      const fresh = g.openAll ? (s.targetTime ? "Goal: " + s.targetTime + " each" : "Not tried yet") : "Start here";
       const meta = passed ? "Passed on " + SF.fmtDate(rec.passedOn)
-        : open ? (rec && rec.attempts ? rec.attempts + (rec.attempts === 1 ? " try" : " tries") + " so far, best " + rec.bestScore + " of " + n : "Start here")
+        : open ? (rec && rec.attempts ? rec.attempts + (rec.attempts === 1 ? " try" : " tries") + " so far, best " + rec.bestScore + " of " + n : fresh)
         : "Pass lesson " + si + " to unlock";
       const body = [
         el("span", { class: "step-num" }, si + 1),
@@ -292,6 +328,37 @@
           }))),
       el("p", { class: "lede" }, "You have earned " + earned + " of " + all.length + " badges."),
       el("div", { class: "badge-grid" }, all.map(function (b) { return S.sticker(b, p.badges[b.id]); }))));
+  };
+
+  // ---------- my colours ----------
+
+  S.style = function (root) {
+    const cur = themeId();
+    root.replaceChildren(el("section", { class: "page" },
+      crumbs([["Home", "#/"]], "My colours"),
+      el("h1", null, "Pick your colours"),
+      el("p", { class: "lede" }, "Tap a colour to change how Sum Fun Maths looks. You can change it any time."),
+      el("div", { class: "theme-grid" }, S.themes.map(function (t) {
+        const on = t.id === cur;
+        return el("button", {
+          class: "theme-tile" + (on ? " on" : ""), type: "button", "data-theme": t.id, "aria-pressed": on ? "true" : "false",
+          onclick: function () {
+            if (on) return;
+            SF.store.progress.settings.theme = t.id;
+            SF.store.save();
+            S.style(root);
+            SF.toast(t.icon + " " + t.name + " it is!");
+          }
+        },
+          el("span", { class: "theme-top" },
+            el("span", { class: "theme-icon", "aria-hidden": "true" }, t.icon),
+            el("span", { class: "theme-name" }, t.name),
+            on ? el("span", { class: "theme-check", "aria-hidden": "true" }, "✓") : null),
+          el("span", { class: "theme-sample", "aria-hidden": "true" },
+            el("span", { class: "theme-btn" }, "Go"),
+            el("span", { class: "theme-dot" }),
+            el("span", { class: "theme-dot deep" })));
+      }))));
   };
 
   // ---------- parent corner ----------

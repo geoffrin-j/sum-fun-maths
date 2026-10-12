@@ -28,6 +28,10 @@
         .sort(function (a, b) { return (a.grade || 0) - (b.grade || 0); });
     },
 
+    // School classes and olympiad sets are shown in separate sections ("kind: olympiad").
+    classes: function () { return D.grades().filter(function (g) { return g.kind !== "olympiad"; }); },
+    olympiads: function () { return D.grades().filter(function (g) { return g.kind === "olympiad"; }); },
+
     grade: function (id) { return raw()[id] || null; },
 
     key: function (gid, tid, sid) { return gid + "/" + tid + "/" + sid; },

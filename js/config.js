@@ -14,6 +14,9 @@ window.SUM_FUN_CONFIG = {
   // nor the lesson ("timeLimit") sets one.
   defaultTimeLimit: 20,
 
+  // Testing: true opens every chapter and lesson. Set back to false for Hannah.
+  unlockAll: true,
+
   // PIN for the Parent corner. Change this.
   parentPin: "1234",
 

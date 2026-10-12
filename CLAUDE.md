@@ -17,7 +17,8 @@ It is opened by double-clicking `index.html`. No server, no build step, no frame
 | File | What it does |
 |---|---|
 | `js/config.js` | Learner name, PIN, questions per test, default time limit, number locale |
-| `data/gradeN.js` | Lesson content for one class. Add a `<script>` tag in `index.html` for each new class |
+| `data/gradeN.js` | Lesson content for one class (ICSE syllabus). Add a `<script>` tag in `index.html` for each new class |
+| `data/olympiadN.js` | Olympiad practice for one class (maths + reasoning). Same schema, shown in its own home-page section |
 | `js/util.js` | `SF.el` DOM builder, shuffle, dates, number/money/time formatting, toast |
 | `js/data.js` | Content access, hrefs, time limits, `validate()` content checker |
 | `js/checker.js` | Answer checking and display per question type |
@@ -27,7 +28,7 @@ It is opened by double-clicking `index.html`. No server, no build step, no frame
 | `js/effects.js` | Generated sounds (Web Audio) and confetti |
 | `js/widgets.js` | Abacus SVG and answer inputs for each question type |
 | `js/test.js` | Test runner: timer, feedback, results, review |
-| `js/screens.js` | Header, file banner, home, class, chapter, lesson, badges, parent corner |
+| `js/screens.js` | Header, file banner, home, class, chapter, lesson, badges, colour themes, parent corner |
 | `js/app.js` | Hash router and startup |
 | `tests/run-tests.js` | `node tests/run-tests.js` — validates all content and checks every answer |
 
@@ -61,13 +62,23 @@ window.SUM_FUN_DATA.grade5 = {
 
 Never change an existing `id` once Hannah has progress: progress keys are `gradeId/topicId/subId`.
 
+### Olympiad sets
+
+`data/olympiad3.js` uses the same schema plus three top-level fields:
+
+- `kind: "olympiad"`: listed under "Olympiad practice" on the home page, not under "Choose your class" (`SF.data.classes()` vs `SF.data.olympiads()`).
+- `openAll: true`: every chapter and lesson is open; no unlocking order.
+- `intro: ["...", ...]`: lines shown in a card at the top of its class page (exam tips).
+
+Its 35 skill types are grouped into 7 themed chapters, ordered fastest to slowest (chapters by the average target time of their lessons, lessons by the middle of their target time). Chapter and lesson ids do not depend on this order. Chapter badges for olympiad sets are named "Olympiad … Champion".
+
 ### Question types
 
-Every question has `q` (text), `type`, `answer`. Optional on any type: `time` (seconds, overrides the lesson's `timeLimit`), `explain` (shown when wrong), `abacus: [TTh, Th, H, T, O]` (draws an abacus above the input).
+Every question has `q` (text), `type`, `answer`. Question text may contain `\n` (shown as line breaks), used to put a data table above the question. Optional on any type: `time` (seconds, overrides the lesson's `timeLimit`), `explain` (shown when wrong), `abacus: [TTh, Th, H, T, O]` (draws an abacus above the input).
 
 | type | answer | extra fields | checking |
 |---|---|---|---|
-| `number` | number | `unit` (label after the box, e.g. "paise") | ignores commas, spaces, ₹, unit words |
+| `number` | number | `unit` (label after the box, e.g. "paise", "cm") | ignores commas, spaces, ₹, paise/rupees and the question's own `unit` |
 | `money` | number | — | ₹ prefix shown; compared to 2 decimals (10 = 10.00) |
 | `compare` | `"<"`, `">"` or `"="` | — | three buttons; keyboard < > = works |
 | `mcq` | one option string | `options[]`, `shuffle: false` to keep order | exact match |
@@ -83,7 +94,7 @@ Set per question by difficulty: quick recall ~15 s, single-step ~20–25 s, mult
 
 - **Pass** = every answer correct AND every answer within its own time limit. The timer never auto-advances; going over just turns it red.
 - **Stars** (best kept per lesson): 3 = pass, 2 = all correct but some slow, 1 = at least 70% correct.
-- **Unlocking:** lesson N opens when lesson N−1 in the same chapter is passed. Chapter N opens when every lesson in chapter N−1 is passed. Classes are always selectable. A parent can manually unlock a lesson in the Parent corner (`manualUnlocks`).
+- **Unlocking:** lesson N opens when lesson N−1 in the same chapter is passed. Chapter N opens when every lesson in chapter N−1 is passed. Classes are always selectable. A parent can manually unlock a lesson in the Parent corner (`manualUnlocks`). `unlockAll: true` in `config.js` opens everything for testing.
 - **Streak:** a day counts when at least one test is finished (local date). Missing a day resets to 1 on the next practice day.
 - **Badges:** see `js/badges.js`. Fixed badges plus one "Champion" badge per chapter, generated from the data.
 
@@ -102,7 +113,7 @@ Set per question by difficulty: quick recall ~15 s, single-step ~20–25 s, mult
   "badges": { "first-steps": "2026-10-09" },
   "manualUnlocks": {},
   "lastLesson": "grade3/numbers/place-face-value",
-  "settings": { "sound": true } }
+  "settings": { "sound": true, "theme": "ocean" } }
 ```
 
 - Always cached in localStorage (`sumfun-progress-v1`).
@@ -115,6 +126,7 @@ Set per question by difficulty: quick recall ~15 s, single-step ~20–25 s, mult
 
 - Build DOM with `SF.el(tag, attrs, ...children)`; never set `innerHTML` from content.
 - UI copy: plain, short, sentence case, written for an 8-year-old. Errors say what to do next.
+- **Themes:** the 🎨 button opens `#/style`, where the learner picks a colour theme (Ocean, Berry, Sunshine, Forest, Galaxy, Sky). The choice is saved in `settings.theme` and applied as `data-theme` on `<html>`. Each theme in `css/style.css` only overrides the `--accent*`, `--hero-*`, `--blob-*` and `--bg` variables; use `var(--accent)` for anything that should follow the theme. To add a theme, add a `[data-theme="id"]` block in the CSS and an entry in `S.themes` in `screens.js`.
 - Design tokens are CSS variables at the top of `css/style.css` (soft pastel app look: white rounded cards, gentle shadows, teal pill buttons, pastel tiles, Nunito). Keep new UI in that style.
 - After any content or checker change, run `node tests/run-tests.js` and make sure it passes.
 - After UI changes, open `index.html` in Chrome and click through: home → class → chapter → lesson → test → results.

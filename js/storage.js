@@ -23,7 +23,7 @@
       badges: {},
       manualUnlocks: {},
       lastLesson: null,
-      settings: { sound: true }
+      settings: { sound: true, theme: "ocean" }
     };
   }
 

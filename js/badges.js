@@ -35,8 +35,8 @@
         if (!t.subtopics.length) return;
         out.push({
           id: "chapter:" + g.id + ":" + t.id,
-          icon: "🏅",
-          name: SF.data.short(t) + " Champion",
+          icon: g.kind === "olympiad" ? "🏆" : "🏅",
+          name: (g.kind === "olympiad" ? "Olympiad " : "") + SF.data.short(t) + " Champion",
           desc: "Pass every lesson in " + SF.data.short(t) + " (" + g.title + ").",
           test: function () { return L().isTopicDone(g, t); }
         });

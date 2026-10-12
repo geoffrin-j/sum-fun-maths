@@ -23,6 +23,15 @@
       .replace(/[\s,\-]+/g, "");
   }
 
+  // Drops the question's own unit word ("240 L", "300 cm") before reading the number.
+  function numOf(q, resp) {
+    if (q.unit && resp !== null && resp !== undefined) {
+      const u = String(q.unit).toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      resp = String(resp).toLowerCase().replace(new RegExp("\\s*" + u + "\\s*$"), "");
+    }
+    return toNum(resp);
+  }
+
   function sameSet(a, b) {
     return a.length === b.length && a.every(function (x) { return b.indexOf(x) >= 0; });
   }
@@ -30,7 +39,7 @@
   function check(q, resp) {
     switch (q.type) {
       case "number": {
-        const n = toNum(resp);
+        const n = numOf(q, resp);
         return !isNaN(n) && Math.abs(n - Number(q.answer)) < 1e-9;
       }
       case "money": {
@@ -56,7 +65,7 @@
 
   function isComplete(q, resp) {
     switch (q.type) {
-      case "number":
+      case "number": return !isNaN(numOf(q, resp));
       case "money": return !isNaN(toNum(resp));
       case "text": return normText(resp).length > 0;
       case "compare":

@@ -43,7 +43,8 @@
     if (!c) return;
     const g = c.getContext("2d"), dpr = window.devicePixelRatio || 1;
     const W = c.width = window.innerWidth * dpr, H = c.height = window.innerHeight * dpr;
-    const colors = ["#3A6FF8", "#FFC531", "#17A673", "#EE4B57", "#7B5CE0"];
+    const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#2E8C91";
+    const colors = [accent, "#FFC531", "#55B45A", "#EF6670", accent, "#8E7BE0"];
     const parts = [];
     for (let i = 0; i < 160; i++) {
       parts.push({

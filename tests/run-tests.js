@@ -66,6 +66,8 @@ const T = (q, r, want, why) => expect(SF.checker.check(q, r) === want, why);
 T({ type: "number", answer: 8000 }, "8,000", true, "commas allowed");
 T({ type: "number", answer: 8000 }, "80 00", true, "spaces ignored");
 T({ type: "number", answer: 300, unit: "paise" }, "300 paise", true, "unit word ignored");
+T({ type: "number", answer: 240, unit: "L" }, "240 l", true, "question's own unit ignored");
+T({ type: "number", answer: 240, unit: "L" }, "240 kg", false, "other units not ignored");
 T({ type: "money", answer: 10 }, "10.00", true, "money 10.00 == 10");
 T({ type: "money", answer: 2.5 }, "2.5", true, "money 2.5 == 2.50");
 T({ type: "money", answer: 21.25 }, "21.2", false, "money 21.2 != 21.25");

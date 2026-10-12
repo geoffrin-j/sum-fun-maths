@@ -16,7 +16,7 @@
 
     // Chapter N opens when chapter N-1 is done.
     topicOpenByRule: function (g, ti) {
-      return ti === 0 || L.isTopicDone(g, g.topics[ti - 1]);
+      return SF.config.unlockAll === true || g.openAll === true || ti === 0 || L.isTopicDone(g, g.topics[ti - 1]);
     },
 
     // Can the chapter page be visited? (Also true if a parent unlocked a lesson in it.)
@@ -27,6 +27,7 @@
 
     // Lesson N opens when lesson N-1 in the same chapter is passed.
     isSubUnlocked: function (g, ti, si) {
+      if (SF.config.unlockAll === true || g.openAll === true) return true;
       const t = g.topics[ti];
       if (L.isManual(K(g, t, t.subtopics[si]))) return true;
       if (!L.topicOpenByRule(g, ti)) return false;

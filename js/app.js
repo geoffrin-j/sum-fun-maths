@@ -6,6 +6,7 @@
 //   #/g/<grade>/t/<topic>/s/<sub>      lesson
 //   #/g/<grade>/t/<topic>/s/<sub>/test practice test
 //   #/badges                           badges and streak
+//   #/style                            pick colours (theme)
 //   #/parent                           parent corner (PIN)
 (function (SF) {
   "use strict";
@@ -25,6 +26,7 @@
 
     if (!p.length) S.home(root);
     else if (p[0] === "badges") S.badges(root);
+    else if (p[0] === "style") S.style(root);
     else if (p[0] === "parent") S.parent(root);
     else if (p[0] === "g" && p[1]) {
       const g = D.grade(p[1]);
